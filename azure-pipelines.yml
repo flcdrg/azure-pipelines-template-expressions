@@ -31,7 +31,7 @@ stages:
 
           - script: echo "Build completed successfully."
 
-  - ${{ if eq(Build.SourceBranch, 'refs/heads/main') }}:
+  - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
       - ${{ each env in parameters.Environments }}:
           - stage: DeployTo${{ env.name }}
             jobs:
