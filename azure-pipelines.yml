@@ -15,11 +15,13 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
+# begin-snippet: MySnippetName
 variables:
   ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
     Environment: "Production"
   ${{ else }}:
     Environment: "Not-Production"
+# end-snippet
 
 stages:
   - stage: Build
