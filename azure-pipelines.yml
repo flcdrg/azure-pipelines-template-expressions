@@ -1,19 +1,49 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+parameters:
+  - name: Environments
+    type: object
+    default:
+      - name: Dev
+        displayName: "Development"
+      - name: Test
+        displayName: "Testing"
+      - name: Prod
+        displayName: "Production"
 
 trigger:
-- main
+  - main
 
 pool:
   vmImage: ubuntu-latest
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+variables:
+  ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
+    Environment: "Production"
+  ${{ else }}:
+    Environment: "Not-Production"
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+stages:
+  - stage: Build
+    jobs:
+      - job: Build
+        steps:
+          - script: echo Building...
+            displayName: "Build Job"
+
+          - script: echo "Build completed successfully."
+
+  - ${{ if eq(Build.SourceBranch, 'refs/heads/main') }}:
+      - ${{ each env in parameters.Environments }}:
+          - stage: DeployTo${{ env.name }}
+            jobs:
+              - job: DeployTo${{ env.name }}
+                displayName: "Deploy to ${{ env.name }}"
+                steps:
+                  - script: echo "Deploying to ${{ env.name }} environment..."
+                    displayName: "Deploy to ${{ env.name }}"
+
+              - ${{ if eq(env.name, 'Prod') }}:
+                  - job: NotifyProd
+                    displayName: "Notify Production Deployment"
+                    steps:
+                      - script: echo "Notifying team about production deployment."
+                        displayName: "Notify Team"
