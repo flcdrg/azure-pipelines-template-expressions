@@ -9,6 +9,10 @@ parameters:
       - name: Prod
         displayName: "Production"
 
+  - name: DependsOn
+    type: string
+    default: "Build"
+
 trigger:
   - main
 
@@ -26,12 +30,43 @@ variables:
 stages:
   - stage: Build
     jobs:
+      - job: Version
+        displayName: "Version Job"
+        steps:
+          - script: echo "Setting version based on branch."
+            displayName: "Set Version"
+
       - job: Build
+
+        # begin-snippet: TemplateExpression-conditional-dependson
+        ${{ if ne(parameter.DependsOn, '') }}:
+          dependsOn:
+            - Version
+        # end-snippet
+
         steps:
           - script: echo Building...
             displayName: "Build Job"
 
           - script: echo "Build completed successfully."
+
+          - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
+              - publish: $(Build.ArtifactStagingDirectory)
+                artifact: drop
+                displayName: "Publish Artifact"
+
+      - job: Notify
+        displayName: "Notify Build Completion"
+        # begin-snippet: TemplateExpression-conditional-dependson-extra
+        dependsOn:
+          - Version
+          - ${{ ne(parameter.DependsOn, '') }}:
+              - ${{ parameter.DependsOn }}
+        # end-snippet
+
+        steps:
+          - script: echo "Build completed. Notifying team."
+            displayName: "Notify Team"
 
   # begin-snippet: TemplateExpression-conditional-each
   - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
