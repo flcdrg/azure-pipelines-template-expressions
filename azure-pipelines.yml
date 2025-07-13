@@ -1,3 +1,4 @@
+# begin-snippet: TemplateExpression-parameters
 parameters:
   - name: Environments
     type: object
@@ -8,7 +9,7 @@ parameters:
         displayName: "Testing"
       - name: Prod
         displayName: "Production"
-
+  # end-snippet
   - name: DependsOn
     type: string
     default: "Build"
@@ -68,8 +69,8 @@ stages:
           - script: echo "Build completed. Notifying team."
             displayName: "Notify Team"
 
-  # begin-snippet: TemplateExpression-conditional-each
   - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
+      # begin-snippet: TemplateExpression-conditional-each
       - ${{ each env in parameters.Environments }}:
           - stage: DeployTo${{ env.name }}
             jobs:
