@@ -60,7 +60,7 @@ stages:
         # begin-snippet: TemplateExpression-conditional-dependson-extra
         dependsOn:
           - Version
-          - ${{ ne(parameter.DependsOn, '') }}:
+          - ${{ if ne(parameter.DependsOn, '') }}:
               - ${{ parameter.DependsOn }}
         # end-snippet
 
