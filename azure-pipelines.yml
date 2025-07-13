@@ -39,7 +39,7 @@ stages:
       - job: Build
 
         # begin-snippet: TemplateExpression-conditional-dependson
-        ${{ if ne(parameter.DependsOn, '') }}:
+        ${{ if ne(parameters.DependsOn, '') }}:
           dependsOn:
             - Version
         # end-snippet
@@ -60,8 +60,8 @@ stages:
         # begin-snippet: TemplateExpression-conditional-dependson-extra
         dependsOn:
           - Version
-          - ${{ if ne(parameter.DependsOn, '') }}:
-              - ${{ parameter.DependsOn }}
+          - ${{ if ne(parameters.DependsOn, '') }}:
+              - ${{ parameters.DependsOn }}
         # end-snippet
 
         steps:
