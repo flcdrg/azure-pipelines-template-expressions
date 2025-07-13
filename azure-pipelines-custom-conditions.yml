@@ -1,0 +1,26 @@
+trigger:
+  - main
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+  - stage: Build
+    jobs:
+      - job: Version
+        displayName: "Version Job"
+        steps:
+          - script: echo "Setting version based on branch."
+            displayName: "Set Version"
+
+      - job: Build
+        steps:
+          - script: echo Building...
+            displayName: "Build Job"
+
+          - script: echo "Build completed successfully."
+
+          - publish: $(Build.ArtifactStagingDirectory)
+            condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+            artifact: drop
+            displayName: "Publish Artifact"

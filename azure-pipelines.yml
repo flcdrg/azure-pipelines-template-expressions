@@ -51,10 +51,12 @@ stages:
 
           - script: echo "Build completed successfully."
 
+          # begin-snippet: TemplateExpression-conditional-step
           - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
               - publish: $(Build.ArtifactStagingDirectory)
                 artifact: drop
                 displayName: "Publish Artifact"
+          # end-snippet
 
       - job: Notify
         displayName: "Notify Build Completion"
@@ -81,11 +83,9 @@ stages:
                     displayName: "Deploy to ${{ env.name }}"
                   # end-snippet
 
-                  # begin-snippet: TemplateExpression-conditional-step
                   - ${{ if eq(env.name, 'Prod') }}:
                       - script: echo "Running production specific tasks."
                         displayName: "Production Tasks"
-                  # end-snippet
 
                   - script: echo "Deployment to ${{ env.name }} completed."
                     displayName: "Deployment Complete"
