@@ -15,7 +15,7 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
-# begin-snippet: MySnippetName
+# begin-snippet: TemplateExpression-variables1
 variables:
   ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
     Environment: "Production"
@@ -33,6 +33,7 @@ stages:
 
           - script: echo "Build completed successfully."
 
+  # begin-snippet: TemplateExpression-conditional-each
   - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
       - ${{ each env in parameters.Environments }}:
           - stage: DeployTo${{ env.name }}
@@ -42,7 +43,16 @@ stages:
                 steps:
                   - script: echo "Deploying to ${{ env.name }} environment..."
                     displayName: "Deploy to ${{ env.name }}"
+                  # end-snippet
 
+                  # begin-snippet: TemplateExpression-conditional-step
+                  - ${{ if eq(env.name, 'Prod') }}:
+                      - script: echo "Running production specific tasks."
+                        displayName: "Production Tasks"
+                  # end-snippet
+
+                  - script: echo "Deployment to ${{ env.name }} completed."
+                    displayName: "Deployment Complete"
               - ${{ if eq(env.name, 'Prod') }}:
                   - job: NotifyProd
                     displayName: "Notify Production Deployment"
